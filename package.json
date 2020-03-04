@@ -1,0 +1,22 @@
+{
+  "name": "deployer",
+  "version": "1.0.0",
+  "description": "PSK Deployer is a custom task runner used in PrivateSky to download and handle all deps and their updates",
+  "main": "Deployer.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/privatesky/deployer.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/privatesky/deployer/issues"
+  },
+  "homepage": "https://github.com/privatesky/deployer#readme"
+}
