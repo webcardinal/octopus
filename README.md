@@ -1,2 +1,2 @@
-# deployer
-PSK Deployer is a custom task runner used in PrivateSky to download and handle all deps and their updates
+# PSK Updater
+PSK Updater is a custom task runner used in PrivateSky to download or update all dependencies.
