@@ -177,6 +177,27 @@ function ActionsRegistry() {
     };
 
     /**
+     * mkdir
+     * @param {Object}action.
+     * @param {Object}dependency
+     * @param {Function}callback
+     */
+    actions.mkdir = function (action, dependency, callback) {
+        if (!action.target) {
+            throw "No target attribute found on: " + JSON.stringify(action);
+        }
+
+        let target = fsExt.resolvePath(action.target);
+        try{
+            fsExt.createDir(target);
+        }catch(err){
+            return callback(err);
+        }
+
+        callback(undefined, `Finished folder "${action.target}" creation`);
+    };
+
+    /**
      *clone
      * Clone function used to make a git clone of repo dependency.src in a specific location action.target
      * Optional clone options can be specified in {Object}action.options
