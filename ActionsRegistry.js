@@ -684,6 +684,22 @@ function ActionsRegistry() {
         }
     };
 
+    actions.executeAsync = function (action, dependency, callback) {
+        if (!action.cmd) {
+            throw "No command given";
+        }
+        console.log("Running command:", action.cmd, "with opts:", action.options);
+        child_process.exec(action.cmd, action.options, function(err, stdout, stderr){
+            if(err){
+                return callback(err);
+            }
+            console.log(stdout);
+            console.log(stderr);
+            callback(undefined, `Execute command finished.`);
+
+        });
+    };
+
     this.registerActionHandler = function (name, handler, overwrite) {
         if (!name) {
             throw "No action name provided!";
