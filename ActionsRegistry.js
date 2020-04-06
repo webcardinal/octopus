@@ -673,7 +673,13 @@ function ActionsRegistry() {
         }
         try {
             console.log("Running command:", action.cmd, "with opts:", action.options);
-            child_process.execSync(action.cmd, action.options);
+            //child_process.execSync(action.cmd, action.options);
+            const options = {
+                stdio: "inherit",
+                shell: true
+            }
+            Object.assign(options, actions.options);
+            child_process.spawnSync(action.cmd, action.args, options);
         } catch (err) {
             if (callback) {
                 callback(err);
