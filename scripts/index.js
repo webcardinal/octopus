@@ -53,7 +53,11 @@ function updateConfig(config, callback) {
 }
 
 function runConfig(config, callback) {
-	const updater = require("deployer");
+	if(typeof config === "function"){
+		callback = config;
+		config = readConfig();
+	}
+	const updater = require("../Deployer");
 
 	updater.setTag("[Octopus]");
 	updater.run(config, callback);
