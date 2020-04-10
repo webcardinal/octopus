@@ -37,9 +37,14 @@ for (let i = 0; i < config.dependencies.length; i++) {
 
 config.dependencies.push(BASIC_CONFIG_ELEMENT);
 
-octopus.updateConfig(config, function (err) {
-	if (err) {
+octopus.runConfig(octopus.createBasicConfig(BASIC_CONFIG_ELEMENT), function(err){
+	if(err){
 		throw err;
 	}
-	console.log("Configuration updated!");
+	octopus.updateConfig(config, function (err) {
+		if (err) {
+			throw err;
+		}
+		console.log("Configuration updated!");
+	});
 });
