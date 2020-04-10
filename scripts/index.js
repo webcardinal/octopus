@@ -30,7 +30,8 @@ function readConfig() {
 					"actions": [
 						{
 							"type": "smartClone",
-							"target": "."
+							"target": ".",
+							"collectLog": false
 						},
 						{
 							"type": "execute",
