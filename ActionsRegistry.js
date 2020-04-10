@@ -229,7 +229,11 @@ function ActionsRegistry() {
             options = action.options;
         }
 
-        global.collectLog = action.collectLog || true;
+        if(typeof action.collectLog !== "undefined"){
+            global.collectLog = action.collectLog;
+        }else{
+            global.collectLog = true;
+        }
 
         _clone(dependency.src, target, options, dependency.credentials, function (err, res) {
             if (!err) {
@@ -306,7 +310,11 @@ function ActionsRegistry() {
                 options = action.options;
             }
 
-            global.collectLog = action.collectLog || true;
+            if(typeof action.collectLog !== "undefined"){
+                global.collectLog = action.collectLog;
+            }else{
+                global.collectLog = true;
+            }
 
             _clone(dependency.src, target, options, dependency.credentials, function (err, res) {
                 if (!err) {
