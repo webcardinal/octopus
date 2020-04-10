@@ -2,10 +2,10 @@ const args = process.argv;
 const TYPE_ARGUMENT = "--type=";
 args.splice(0, 2);
 
-let type = "app";
-if(typeof args[0]!== "undefined" && args[0].indexOf(TYPE_ARGUMENT) !== -1){
-	type = args.splice(1);
-	type.replace(TYPE_ARGUMENT, "");
+let bindType = "app";
+if (typeof args[0] !== "undefined" && args[0].indexOf(TYPE_ARGUMENT) !== -1) {
+	bindType = args.splice(0, 1);
+	bindType = bindType[0].replace(TYPE_ARGUMENT, "");
 }
 
 const octopus = require("./index.js");
@@ -58,22 +58,22 @@ if (typeof binDep === "undefined") {
 }
 
 binDep.actions = [];
-
-switch (type) {
-	case "app":
-		let appAction = require("bindApp").createAction(solutionName, targetName);
-		binDep.actions.push(appAction);
-		break;
+switch (bindType) {
 	case "wallet":
-		let walletAction = require("bindWallet").createAction(solutionName, targetName);
+		let walletAction = require("./bindWallet").createAction(solutionName, targetName);
+		console.log("Wallet action", walletAction);
 		binDep.actions.push(walletAction);
+		break;
+	case "app":
+		let appAction = require("./bindApp").createAction(solutionName, targetName);
+		binDep.actions.push(appAction);
 		break;
 	default:
 		throw new Error("Unrecognized type");
 }
 
-octopus.runConfig(octopus.createBasicConfig(binDep), function(err){
-	if(err){
+octopus.runConfig(octopus.createBasicConfig(binDep), function (err) {
+	if (err) {
 		throw err;
 	}
 	octopus.updateConfig(config, function (err) {
