@@ -1,18 +1,25 @@
 const args = process.argv;
+const TYPE_ARGUMENT = "--type=";
 args.splice(0, 2);
+
+let type = "app";
+if(typeof args[0]!== "undefined" && args[0].indexOf(TYPE_ARGUMENT) !== -1){
+	type = args.splice(1);
+	type.replace(TYPE_ARGUMENT, "");
+}
 
 const octopus = require("./index.js");
 if (args.length !== 2) {
-	octopus.handleError("Expected to receive 2 params: <loaderFolderName> and <walletFolderName>.");
+	octopus.handleError("Expected to receive 2 params: <solutionName> and <targetName>.");
 }
 
-const loaderFolderName = args[0];
-const walletFolderName = args[1];
+const solutionName = args[0];
+const targetName = args[1];
 
 const config = octopus.readConfig();
 
 function buildIdentifier() {
-	return `${loaderFolderName}_bind_to_${walletFolderName}`;
+	return `${solutionName}_bind_to_${targetName}`;
 }
 
 let loaderConfigIndex;
@@ -20,11 +27,11 @@ let walletConfigIndex;
 let binDep;
 for (let i = 0; i < config.dependencies.length; i++) {
 	let dep = config.dependencies[i];
-	if (dep.name === loaderFolderName) {
+	if (dep.name === solutionName) {
 		loaderConfigIndex = i;
 	}
 
-	if (dep.name === walletFolderName) {
+	if (dep.name === targetName) {
 		walletConfigIndex = i;
 	}
 
@@ -34,11 +41,11 @@ for (let i = 0; i < config.dependencies.length; i++) {
 }
 
 if (typeof loaderConfigIndex === "undefined") {
-	octopus.handleError(`Unable to find a loader config called "${loaderFolderName}"`)
+	octopus.handleError(`Unable to find a solution config called "${solutionName}"`)
 }
 
 if (typeof walletConfigIndex === "undefined") {
-	octopus.handleError(`Unable to find a wallet config called "${walletFolderName}"`)
+	octopus.handleError(`Unable to find a wallet/app config called "${targetName}"`)
 }
 
 if (typeof binDep === "undefined") {
@@ -51,14 +58,19 @@ if (typeof binDep === "undefined") {
 }
 
 binDep.actions = [];
-binDep.actions.push({
-	"type" : "copy",
-	"src": `./${walletFolderName}/bindedSeed`,
-	"target": `./${loaderFolderName}/bindedSeed`,
-	"options": {
-		overwrite: true
-	}
-});
+
+switch (type) {
+	case "app":
+		let appAction = require("bindApp").createAction(solutionName, targetName);
+		binDep.actions.push(appAction);
+		break;
+	case "wallet":
+		let walletAction = require("bindWallet").createAction(solutionName, targetName);
+		binDep.actions.push(walletAction);
+		break;
+	default:
+		throw new Error("Unrecognized type");
+}
 
 octopus.runConfig(octopus.createBasicConfig(binDep), function(err){
 	if(err){
