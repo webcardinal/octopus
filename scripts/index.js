@@ -1,6 +1,6 @@
 const path = require("path");
 //path.resolve(path.join(__dirname, "./../octopus.json"));
-const CONFIG_FILE_PATH = "./octopus.json";
+const CONFIG_FILE_PATH = path.resolve("./octopus.json");
 
 function createBasicConfig(...configParts) {
 	return {"workDir": ".", "dependencies": [...configParts]};
@@ -9,9 +9,11 @@ function createBasicConfig(...configParts) {
 function readConfig() {
 	let config;
 	try {
+		console.log("Looking for configuration file at path", CONFIG_FILE_PATH);
 		config = require(CONFIG_FILE_PATH);
 	} catch (err) {
 		if (err.code === "MODULE_NOT_FOUND") {
+			console.log("Configuration file octopus.json not found. Creating a new config object.");
 			config = createBasicConfig();
 			let privateSkyRepo;
 			console.log("Looking for PRIVATESKY_REPO_NAME as env variable. It can be used to change what PrivateSky repo will be user: psk-release or privatesky.");

@@ -672,7 +672,10 @@ function ActionsRegistry() {
             throw "No command given";
         }
         try {
-            console.log("Running command:", action.cmd, "with opts:", action.options);
+            console.log("Running command:", action.cmd);
+            if(typeof actions.options !== "undefined"){
+                console.log("with opts:", action.options);
+            }
             //child_process.execSync(action.cmd, action.options);
             const options = {
                 stdio: "inherit",
