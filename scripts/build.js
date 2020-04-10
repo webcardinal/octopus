@@ -21,7 +21,18 @@ if (typeof configPart === "undefined") {
 	octopus.handleError(`No config found for target "${folderName}"`);
 }
 
-octopus.runConfig(octopus.createBasicConfig(configPart), function (err, result) {
+const buildConfig = {
+	"name": "build",
+	"src": "",
+	"actions": [
+		{
+			"type": "execute",
+			"cmd": `cd ${folderName} && npm run build`
+		}
+	]
+};
+
+octopus.runConfig(octopus.createBasicConfig(buildConfig), function (err, result) {
 	if (err) {
 		throw err;
 	}
