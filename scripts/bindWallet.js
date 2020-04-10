@@ -1,12 +1,12 @@
-function createAction(solution, walletName) {
-	return {
+function populateActions(actions, solution, walletName) {
+	actions.push({
 		"type": "copy",
 		"src": `./${walletName}/seed`,
 		"target": `./web-server/${solution}/wallet-template/seed`,
 		"options": {
 			overwrite: true
 		}
-	};
+	});
 }
 
-module.exports = {createAction};
+module.exports = {populateActions};

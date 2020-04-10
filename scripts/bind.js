@@ -60,13 +60,10 @@ if (typeof binDep === "undefined") {
 binDep.actions = [];
 switch (bindType) {
 	case "wallet":
-		let walletAction = require("./bindWallet").createAction(solutionName, targetName);
-		console.log("Wallet action", walletAction);
-		binDep.actions.push(walletAction);
+		let walletAction = require("./bindWallet").populateActions(binDep.actions, solutionName, targetName);
 		break;
 	case "app":
-		let appAction = require("./bindApp").createAction(solutionName, targetName);
-		binDep.actions.push(appAction);
+		let appAction = require("./bindApp").populateActions(binDep.actions, solutionName, targetName);
 		break;
 	default:
 		throw new Error("Unrecognized type");
