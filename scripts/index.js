@@ -63,6 +63,11 @@ function runConfig(config, callback) {
 		callback = config;
 		config = readConfig();
 	}
+
+	if(typeof config === "undefined"){
+		config = readConfig();
+	}
+
 	const updater = require("../Deployer");
 
 	updater.setTag("[Octopus]");
