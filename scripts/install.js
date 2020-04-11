@@ -4,7 +4,8 @@ args.splice(0, 2);
 
 let config;
 if (args.length === 1) {
-	config = require(args[0])
+	const path = require("path");
+	config = require(path.resolve(args[0]));
 }
 
 octopus.runConfig(config, function (err) {
