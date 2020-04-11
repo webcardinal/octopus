@@ -2,7 +2,7 @@ const octopus = require("./index");
 
 args.splice(0, 2);
 
-const config;
+let config;
 if (args.length === 1) {
 	config = require(args[0])
 }
