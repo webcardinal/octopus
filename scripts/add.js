@@ -19,9 +19,6 @@ const BASIC_CONFIG_ELEMENT = {
 	}, {
 		"type": "execute",
 		"cmd": `cd ${folderName} && npm install`
-	}, {
-		"type": "execute",
-		"cmd": `cd ${folderName} && npm build`
 	}]
 };
 
