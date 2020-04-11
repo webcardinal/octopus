@@ -1,5 +1,5 @@
 const octopus = require("./index");
-
+const args = process.argv;
 args.splice(0, 2);
 
 let config;
