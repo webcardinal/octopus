@@ -42,7 +42,6 @@ for (let i = 0; i < config.dependencies.length; i++) {
 	let dep = config.dependencies[i];
 	if (dep.name === buildIdentifier()) {
 		binDep = config.dependencies[i];
-		console.log("binDep", binDep, buildIdentifier());
 		break;
 	}
 }
