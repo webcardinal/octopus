@@ -42,9 +42,10 @@ for (let i = 0; i < config.dependencies.length; i++) {
 	let dep = config.dependencies[i];
 	if (dep.name === buildIdentifier()) {
 		binDep = config.dependencies[i];
+		console.log("binDep", binDep, buildIdentifier());
+		break;
 	}
 }
-
 
 if (typeof loaderConfigIndex === "undefined") {
 	octopus.handleError(`Unable to find a solution config called "${solutionName}"`)
@@ -66,18 +67,18 @@ if (typeof binDep === "undefined") {
 		]
 	};
 
-	config.dependencies.push(binDep);
-}
+	switch (bindType) {
+		case "wallet":
+			require("./bindWallet").populateActions(binDep.actions, solutionName, targetName);
+			break;
+		case "app":
+			require("./bindApp").populateActions(binDep.actions, solutionName, targetName);
+			break;
+		default:
+			throw new Error("Unrecognized type");
+	}
 
-switch (bindType) {
-	case "wallet":
-		require("./bindWallet").populateActions(binDep.actions, solutionName, targetName);
-		break;
-	case "app":
-		require("./bindApp").populateActions(binDep.actions, solutionName, targetName);
-		break;
-	default:
-		throw new Error("Unrecognized type");
+	config.dependencies.push(binDep);
 }
 
 octopus.runConfig(octopus.createBasicConfig(binDep), function (err) {
