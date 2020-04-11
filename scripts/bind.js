@@ -9,6 +9,8 @@ if (typeof args[0] !== "undefined" && args[0].indexOf(TYPE_ARGUMENT) !== -1) {
 }
 
 const octopus = require("./index.js");
+const installConfig = octopus.readConfig();
+octopus.changeConfigFile("./bind_octopus.json");
 if (args.length !== 2) {
 	octopus.handleError("Expected to receive 2 params: <solutionName> and <targetName>.");
 }
@@ -16,7 +18,7 @@ if (args.length !== 2) {
 const solutionName = args[0];
 const targetName = args[1];
 
-const config = octopus.readConfig();
+const config = octopus.readConfig(true);
 
 function buildIdentifier() {
 	return `${solutionName}_bind_to_${targetName}`;
@@ -25,8 +27,8 @@ function buildIdentifier() {
 let loaderConfigIndex;
 let walletConfigIndex;
 let binDep;
-for (let i = 0; i < config.dependencies.length; i++) {
-	let dep = config.dependencies[i];
+for (let i = 0; i < installConfig.dependencies.length; i++) {
+	let dep = installConfig.dependencies[i];
 	if (dep.name === solutionName) {
 		loaderConfigIndex = i;
 	}
@@ -34,11 +36,15 @@ for (let i = 0; i < config.dependencies.length; i++) {
 	if (dep.name === targetName) {
 		walletConfigIndex = i;
 	}
+}
 
+for (let i = 0; i < config.dependencies.length; i++) {
+	let dep = config.dependencies[i];
 	if (dep.name === buildIdentifier()) {
 		binDep = config.dependencies[i];
 	}
 }
+
 
 if (typeof loaderConfigIndex === "undefined") {
 	octopus.handleError(`Unable to find a solution config called "${solutionName}"`)
@@ -51,13 +57,18 @@ if (typeof walletConfigIndex === "undefined") {
 if (typeof binDep === "undefined") {
 	binDep = {
 		"name": buildIdentifier(),
-		"src": ""
+		"src": "",
+		"actions":[
+			{
+				"type": "execute",
+				"cmd": `cd ${targetName} && npm run build`
+			}
+		]
 	};
 
 	config.dependencies.push(binDep);
 }
 
-binDep.actions = [];
 switch (bindType) {
 	case "wallet":
 		require("./bindWallet").populateActions(binDep.actions, solutionName, targetName);

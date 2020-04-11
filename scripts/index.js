@@ -1,12 +1,12 @@
 const path = require("path");
 //path.resolve(path.join(__dirname, "./../octopus.json"));
-const CONFIG_FILE_PATH = path.resolve("./octopus.json");
+let CONFIG_FILE_PATH = path.resolve("./octopus.json");
 
 function createBasicConfig(...configParts) {
 	return {"workDir": ".", "dependencies": [...configParts]};
 }
 
-function readConfig() {
+function readConfig(disableInitialization) {
 	let config;
 	try {
 		console.log("Looking for configuration file at path", CONFIG_FILE_PATH);
@@ -22,23 +22,26 @@ function readConfig() {
 			}else{
 				privateSkyRepo = "privatesky";
 			}
-			// we need a default privatesky instance in order to have access to Brick Storage
-			config.dependencies.push(
-				{
-					"name": "privatesky",
-					"src": `http://github.com/privatesky/${privateSkyRepo}.git`,
-					"actions": [
-						{
-							"type": "smartClone",
-							"target": ".",
-							"collectLog": false
-						},
-						{
-							"type": "execute",
-							"cmd": `cd ./privatesky && npm install && npm run build`
-						}
-					]
-				});
+
+			if(!disableInitialization){
+				// we need a default privatesky instance in order to have access to Brick Storage
+				config.dependencies.push(
+					{
+						"name": "privatesky",
+						"src": `http://github.com/privatesky/${privateSkyRepo}.git`,
+						"actions": [
+							{
+								"type": "smartClone",
+								"target": ".",
+								"collectLog": false
+							},
+							{
+								"type": "execute",
+								"cmd": `cd ./privatesky && npm install && npm run build`
+							}
+						]
+					});
+			}
 		} else {
 			throw err;
 		}
@@ -58,13 +61,8 @@ function updateConfig(config, callback) {
 function runConfig(config, callback) {
 	if(typeof config === "function"){
 		callback = config;
-		config = undefined;
-	}
-	
-	if(typeof config === "undefined"){
 		config = readConfig();
 	}
-	
 	const updater = require("../Deployer");
 
 	updater.setTag("[Octopus]");
@@ -78,10 +76,15 @@ function handleError(...args){
 	process.exit(exitCode);
 }
 
+function changeConfigFile(configFilePath){
+	CONFIG_FILE_PATH = configFilePath;
+}
+
 module.exports = {
 	createBasicConfig,
 	readConfig,
 	updateConfig,
 	runConfig,
-	handleError
+	handleError,
+	changeConfigFile
 };
