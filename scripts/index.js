@@ -82,7 +82,7 @@ function handleError(...args){
 }
 
 function changeConfigFile(configFilePath){
-	CONFIG_FILE_PATH = configFilePath;
+	CONFIG_FILE_PATH = path.resolve(configFilePath);
 }
 
 module.exports = {
