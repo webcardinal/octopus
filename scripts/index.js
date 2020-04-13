@@ -37,7 +37,7 @@ function readConfig(disableInitialization) {
 							},
 							{
 								"type": "execute",
-								"cmd": `cd ./privatesky && npm install && npm run build`
+								"cmd": `cd privatesky && npm install && npm run build`
 							}
 						]
 					});
