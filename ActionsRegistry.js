@@ -697,15 +697,15 @@ function ActionsRegistry() {
 				callback(err);
 			}
 		}
-		let err;
+	/*	let err;
 		if (child.status !== 0) {
 			err = new Error(`Command finished with exit code ${child.status}. Hint: inspect command configuration, environment variables etc. and try again.`);
-		}
+		}*/
 		if (callback) {
 			callback(err);
-		} else {
+		} /*else {
 			throw err;
-		}
+		}*/
 	};
 
     actions.executeAsync = function (action, dependency, callback) {
