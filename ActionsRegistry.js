@@ -702,7 +702,7 @@ function ActionsRegistry() {
 			err = new Error(`Command finished with exit code ${child.status}. Hint: inspect command configuration, environment variables etc. and try again.`);
 		}*/
 		if (callback) {
-			callback(err);
+			callback();
 		} /*else {
 			throw err;
 		}*/
