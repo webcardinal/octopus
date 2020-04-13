@@ -675,31 +675,38 @@ function ActionsRegistry() {
         callback(null, `Finished checksum action on dependency ${dependency.name}`);
     };
 
-    actions.execute = function (action, dependency, callback) {
-        if (!action.cmd) {
-            throw "No command given";
-        }
-        try {
-            console.log("Running command:", action.cmd);
-            if(typeof actions.options !== "undefined"){
-                console.log("with opts:", action.options);
-            }
-            //child_process.execSync(action.cmd, action.options);
-            const options = {
-                stdio: "inherit",
-                shell: true
-            }
-            Object.assign(options, actions.options);
-            child_process.spawnSync(action.cmd, action.args, options);
-        } catch (err) {
-            if (callback) {
-                callback(err);
-            }
-        }
-        if (callback) {
-            callback();
-        }
-    };
+	actions.execute = function (action, dependency, callback) {
+		if (!action.cmd) {
+			throw "No command given";
+		}
+		let child;
+		try {
+			console.log("Running command:", action.cmd);
+			if (typeof action.options !== "undefined") {
+				console.log("with opts:", action.options);
+			}
+			//child_process.execSync(action.cmd, action.options);
+			const options = {
+				stdio: "inherit",
+				shell: true
+			};
+			Object.assign(options, action.options);
+			child = child_process.spawnSync(action.cmd, action.args, options);
+		} catch (err) {
+			if (callback) {
+				callback(err);
+			}
+		}
+		let err;
+		if (child.status !== 0) {
+			err = new Error(`Command finished with exit code ${child.status}. Hint: inspect command configuration, environment variables etc. and try again.`);
+		}
+		if (callback) {
+			callback(err);
+		} else {
+			throw err;
+		}
+	};
 
     actions.executeAsync = function (action, dependency, callback) {
         if (!action.cmd) {
