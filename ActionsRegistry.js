@@ -20,7 +20,7 @@ const changeSetDefaultSize = 3;
  * @constructor
  */
 function ActionsRegistry() {
-    var actions = {};
+    let actions = {};
 
     // default actions
     /**
@@ -48,7 +48,7 @@ function ActionsRegistry() {
             commandOpts.cwd = dependency.workDir;
         }
 
-        var cmd = "npm install " + target + " --no-save --no-package-lock --only=prod";
+        let cmd = "npm install " + target + " --no-save --no-package-lock --only=prod";
         console.log(cmd);
         let error = null;
         let response = `Finished install action on dependency ${dependency.name}`;
@@ -79,27 +79,27 @@ function ActionsRegistry() {
             throw  "No target attribute found on: " + JSON.stringify(action);
         }
 
-        var src = dependency.src;
-        var target = fsExt.resolvePath(path.join(action.target, dependency.name));
+        let src = dependency.src;
+        let target = fsExt.resolvePath(path.join(action.target, dependency.name));
         fsExt.createDir(action.target);
 
         console.info(`Start downloading ${src} to folder ${target}`);
         _downloadAsync(src, target, callback);
     };
 
-    var _downloadAsync = function (url, dest, callback) {
+    let _downloadAsync = function (url, dest, callback) {
 
         performRequest(url, dest, callback);
 
         function performRequest(url, dest, callback) {
-            var maxNumRedirects = 5;
+            let maxNumRedirects = 5;
 
             function doRequest(url, callback, redirectCount) {
                 if (redirectCount > maxNumRedirects) {
                     throw "Max number of redirects for URL: " + url + " has reached!"
                 }
 
-                var protocol = resolveProtocol(url);
+                let protocol = resolveProtocol(url);
                 if (typeof protocol === "string" || protocol == null) {
                     throw "URL Protocol " + protocol + " not supported! Supported protocols are http and https!"
                 }
@@ -121,7 +121,7 @@ function ActionsRegistry() {
 
                     } else {
                         // no redirect; capture the response as normal and invoke the success callback
-                        var file = fs.createWriteStream(dest);
+                        let file = fs.createWriteStream(dest);
                         res.pipe(file);
                         file.on('finish', function () {
                             file.close(callback);  // async
@@ -164,7 +164,7 @@ function ActionsRegistry() {
             throw "No source (src) attribute found on: " + JSON.stringify(action);
         }
 
-        var target = os.tmpdir();
+        let target = os.tmpdir();
         if (action.target) {
             target = action.target;
         }
@@ -211,7 +211,7 @@ function ActionsRegistry() {
             throw "No source (src) attribute found on: " + JSON.stringify(dependency);
         }
 
-        var target = os.tmpdir();
+        let target = os.tmpdir();
         if (action.target) {
             target = fsExt.resolvePath(path.join(action.target, dependency.name));
         }
@@ -221,7 +221,7 @@ function ActionsRegistry() {
             throw `Destination path (target) ${target} already exists and is not an empty directory.`;
         }
 
-        var options = {
+        let options = {
             "depth": "1",
             "branch": "master"
         };
@@ -249,7 +249,7 @@ function ActionsRegistry() {
             throw "No source (src) attribute found on: " + JSON.stringify(dependency);
         }
 
-        var target = os.tmpdir();
+        let target = os.tmpdir();
         if (action.target) {
             target = fsExt.resolvePath(path.join(action.target, dependency.name));
         }
@@ -260,19 +260,19 @@ function ActionsRegistry() {
             basicProcOptions = {cwd: path.resolve(target), stdio: [0, "pipe", "pipe"]};
 
             child_process.exec("git remote -v", basicProcOptions, function (err, stdout, stderr) {
-                var next = true;
+                let next = true;
                 if (err) {
                     console.log(err);
                 } else {
-                    var originFetchRegex = new RegExp('^[origin]*\\s*' + dependency.src + '[.git]*\\s*\\(fetch\\)', 'g');
-                    var matchedArr = stdout.match(originFetchRegex)
+                    let originFetchRegex = new RegExp('^[origin]*\\s*' + dependency.src + '[.git]*\\s*\\(fetch\\)', 'g');
+                    let matchedArr = stdout.match(originFetchRegex)
                     if (!matchedArr) {
                         throw new Error(`Different remotes found on repo ${target}`);
                     }
 
                     try {
                         child_process.execSync("git stash", basicProcOptions);
-                        var pullResult = child_process.execSync("git pull", basicProcOptions);
+                        let pullResult = child_process.execSync("git pull", basicProcOptions);
                         pullResult = pullResult.toString();
                         if (pullResult.indexOf("Already up-to-date") === -1) {
                             try {
@@ -283,7 +283,7 @@ function ActionsRegistry() {
                                 console.log(err);
                             }
                         }
-                        var finalResult = child_process.execSync("git stash apply", basicProcOptions);
+                        let finalResult = child_process.execSync("git stash apply", basicProcOptions);
                         if (finalResult.indexOf("Unmerged") !== -1) {
                             callback(new Error(`Repo ${target} needs attention! (Merging issues)`), `Finished update action on dependency ${dependency.name}`)
                         }
@@ -302,7 +302,7 @@ function ActionsRegistry() {
             //throw `Destination path (target) ${target} already exists and is not an empty directory.`;
         } else {
 
-            var options = {
+            let options = {
                 "depth": "1",
                 "branch": "master"
             };
@@ -324,8 +324,8 @@ function ActionsRegistry() {
         }
     };
 
-    var _clone = function (remote, tmp, options, credentials, callback) {
-        var commandExists = _commandExistsSync("git");
+    let _clone = function (remote, tmp, options, credentials, callback) {
+        let commandExists = _commandExistsSync("git");
         if (!commandExists) {
             throw "git command does not exist! Please install git and run again the program!"
         }
@@ -341,7 +341,7 @@ function ActionsRegistry() {
 
         console.log(`Running command ${cmd}`);
 
-        var errorHandlers = {
+        let errorHandlers = {
             "warning: You appear to have cloned an empty repository": function () {
                 console.log("Empty repo. Nothing to worry. Continue...");
                 return true;
@@ -349,10 +349,10 @@ function ActionsRegistry() {
         };
 
         child_process.exec(cmd, {stdio: [0, "pipe", "pipe"]}, function (err, stdout, stderr) {
-            var next = true;
-            var handled = false;
+            let next = true;
+            let handled = false;
             if (err) {
-                for (var prop in errorHandlers) {
+                for (let prop in errorHandlers) {
                     if (stdout && stdout.indexOf(prop) !== -1 || stderr && stderr.indexOf(prop) !== -1) {
                         next = errorHandlers[prop]();
                         if (!next) {
@@ -375,7 +375,7 @@ function ActionsRegistry() {
                     stdio: [0, "pipe", "pipe"]
                 }, function (err, stdout, stderr) {
                     if (!err) {
-                        var index = stdout.indexOf("\n\n");
+                        let index = stdout.indexOf("\n\n");
                         if (index !== -1) {
                             index += 2;
                         }
@@ -394,7 +394,7 @@ function ActionsRegistry() {
         });
     };
 
-    var _parseRemoteHttpUrl = function (remote, credentials) {
+    let _parseRemoteHttpUrl = function (remote, credentials) {
 
         // if credentials are given, add them in the URL
         if (credentials && credentials.username && credentials.password) {
@@ -456,7 +456,7 @@ function ActionsRegistry() {
             }
         }
 
-        var commandExists = _commandExistsSync("git");
+        let commandExists = _commandExistsSync("git");
         if (!commandExists) {
             throw "git command does not exist! Please install git and run again the program!"
         }
@@ -464,9 +464,9 @@ function ActionsRegistry() {
         _commit(dependency.src, action.target, action.message, dependency.credentials, action.options ? action.options.branch : undefined, callback);
     };
 
-    var _commit = function (remote, workDir, message, credentials, branch, callback) {
+    let _commit = function (remote, workDir, message, credentials, branch, callback) {
 
-        var errorHandlers = {
+        let errorHandlers = {
             "nothing to commit, working directory clean": function () {
                 console.log("Nothing to commit.");
                 return false;
@@ -479,7 +479,7 @@ function ActionsRegistry() {
 
         remote = _parseRemoteHttpUrl(remote, credentials);
 
-        var commands = [];
+        let commands = [];
 
         if (credentials) {
             let username = credentials.username || "unassigned";
@@ -503,11 +503,11 @@ function ActionsRegistry() {
                 cwd: path.resolve(workDir),
                 stdio: [0, "pipe", "pipe"]
             }, function (err, stdout, stderr) {
-                var next = true;
+                let next = true;
                 if (err) {
                     console.log("Commit command encountered next error", err);
                 }
-                for (var prop in errorHandlers) {
+                for (let prop in errorHandlers) {
                     if (stdout && stdout.indexOf(prop) !== -1 || stderr && stderr.indexOf(prop) !== -1) {
                         next = errorHandlers[prop]();
                     }
@@ -532,8 +532,8 @@ function ActionsRegistry() {
 
     };
 
-    var _commandExistsSync = function (commandName) {
-        var isWin = (os.platform() === 'win32');
+    let _commandExistsSync = function (commandName) {
+        let isWin = (os.platform() === 'win32');
 
         try {
             let cmd = isWin ?
@@ -552,7 +552,7 @@ function ActionsRegistry() {
 
     };
 
-    var _localExecutableSync = function (commandName) {
+    let _localExecutableSync = function (commandName) {
         try {
             accessSync(commandName, constants.F_OK | constants.X_OK);
             return true;
@@ -572,7 +572,7 @@ function ActionsRegistry() {
      * @param {Function}callback
      */
     actions.copy = function (action, dependency, callback) {
-        var src = action.src || dependency.src;
+        let src = action.src || dependency.src;
         if (!src) {
             throw "No source (src) attribute found on: " + JSON.stringify(dependency);
         }
@@ -623,15 +623,15 @@ function ActionsRegistry() {
         callback(null, `Finished extract action on dependency ${dependency.name}`);
     };
 
-    var _extractSync = function (src, dest) {
+    let _extractSync = function (src, dest) {
         if (!fs.existsSync(src)) {
             throw `Archive ${src} does not exist!`;
         }
 
-        var isWin = (os.platform() === 'win32');
-        var cmdName = isWin ? "powershell" : "unzip";
+        let isWin = (os.platform() === 'win32');
+        let cmdName = isWin ? "powershell" : "unzip";
 
-        var commandExists = _commandExistsSync(cmdName);
+        let commandExists = _commandExistsSync(cmdName);
         if (!commandExists) {
             throw `Command ${cmdName} does not exist! Please install it, before running again!`;
         }
@@ -667,7 +667,7 @@ function ActionsRegistry() {
 
         let src = fsExt.resolvePath(action.src);
 
-        var checksum = fsExt.checksum(src, action.algorithm, action.encoding);
+        let checksum = fsExt.checksum(src, action.algorithm, action.encoding);
         if (checksum !== action.expectedChecksum) {
             throw `Calculated checksum for ${src} was ${checksum} and it was expected ${action.expectedChecksum}`;
         }
@@ -773,7 +773,7 @@ function ActionsRegistry() {
 
 }
 
-var defaultActionsRegistry = new ActionsRegistry();
+let defaultActionsRegistry = new ActionsRegistry();
 
 exports.getRegistry = function () {
     return defaultActionsRegistry;

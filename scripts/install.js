@@ -2,14 +2,14 @@ const octopus = require("./index");
 const args = process.argv;
 args.splice(0, 2);
 
-let config;
+let tasksListSelector;
 if (args.length === 1) {
-	const path = require("path");
-	config = require(path.resolve(args[0]));
+	tasksListSelector = args[0];
 }
 
-octopus.runConfig(config, function (err) {
+octopus.runConfig(octopus.readConfig(), tasksListSelector, function (err, res) {
 	if (err) {
 		throw err;
 	}
+	console.log(res);
 });

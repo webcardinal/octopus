@@ -1,11 +1,11 @@
 const fs = require("fs");
 const actionsRegistry = require("./ActionsRegistry");
 const path = require("path");
-let TAG = "[Deployer]";
+let TAG = "[Octopus]";
 
-function Deployer() {
+function Runner() {
 
-    var self = {};
+    let self = {};
 
     self.setTag = function(tagName){
         TAG = tagName;
@@ -22,7 +22,7 @@ function Deployer() {
 	 */
     self.runBasicConfig = function(sourceFolder, configFileOrObject, callback){
 		__minimalDepsConversion(configFileOrObject, function(err, deps){
-        	var config = {
+        	let config = {
 				"workDir": sourceFolder || "." ,
 				"dependencies": deps
         	};
@@ -80,7 +80,11 @@ function Deployer() {
      * @param configFileOrObject
      * @param callback
      */
-    self.run = function (configFileOrObject, callback) {
+    self.run = function (configFileOrObject, configTarget, callback) {
+    	if(typeof configTarget === "function"){
+    		callback = configTarget;
+    		configTarget = "dependencies";
+		}
 
         if (typeof callback !== "function") {
             throw "Callback provided is not a function!";
@@ -88,13 +92,13 @@ function Deployer() {
 
         this.callback = callback;
         try {
-            __init(configFileOrObject);
-            console.info(TAG, "Start checking dependencies...");
-            console.info(TAG, `Found ${self.dependencies.length} dependencies...`);
-            if (self.dependencies.length > 0) {
+            __init(configFileOrObject, configTarget);
+            console.info(TAG, `Start checking ${configTarget}...`);
+            console.info(TAG, `Found ${self.tasks.length} ${configTarget}...`);
+            if (self.tasks.length > 0) {
                 __runDependency(0);
             } else {
-                let response = "No dependency to process!";
+                let response = `No ${configFileOrObject} to process!`;
                 if (self.callback) {
                     self.callback(null, response);
                 }
@@ -106,15 +110,15 @@ function Deployer() {
         }
     };
 
-    function __init(configFileOrObject) {
+    function __init(configFileOrObject, depsType) {
         self.actionsRegistry = actionsRegistry.getRegistry();
         self.configJson = {};
-        self.dependencies = [];
+        self.tasks = [];
 
-        var config = __checkConfig(configFileOrObject);
+        let config = __checkConfig(configFileOrObject, depsType);
         if (config) {
             self.configJson = config;
-            self.dependencies = config.dependencies;
+            self.tasks = config[depsType];
         }
 
         if (self.configJson.workDir) {
@@ -126,20 +130,12 @@ function Deployer() {
 	 *__setDefaultActions
 	 *    Set default actions for deps that don't have
 	 *
-	 * @param {Object}dependency
+	 * @param {Object}dep
 	 * @returns
 	 *@private __setDefaultActions
 	 */
 	function __setDefaultActions(dep){
 		const defaultActions = [
-			/*{
-				"type": "remove",
-				"target": "modules/"+dep.name
-			},
-			{
-				"type": "clone",
-				"target": "modules"
-			}*/
             {
                 "type": "smartClone",
                 "target": "modules"
@@ -182,20 +178,20 @@ function Deployer() {
      * @returns {{}} config
      *@private__checkConfig
      */
-    function __checkConfig(configFileOrObject) {
+    function __checkConfig(configFileOrObject, targetConfig) {
 
         let config = __basicConfigTest(configFileOrObject);
-
-        if (!config.dependencies) {
-            throw "No dependencies found!";
+		let tasks = config[targetConfig];
+        if (typeof tasks === "undefined") {
+            throw `No tasks found! [${targetConfig}]`;
         }
 
-        if (!Array.isArray(config.dependencies)) {
-            throw "Dependencies prop is not Array!";
+        if (!Array.isArray(tasks)) {
+            throw `${targetConfig} prop is not Array!`;
         }
 
-        for (let i = 0, len = config.dependencies.length; i < len; i++) {
-            let dep = config.dependencies[i];
+        for (let i = 0, len = tasks.length; i < len; i++) {
+            let dep = tasks[i];
             if (!dep.actions || !Array.isArray(dep.actions) || dep.actions.length === 0) {
                 //throw `No actions available for ${dep.name} dependency or wrong format.`;
 				console.log(`No actions available for ${dep.name} dependency. Setting a default action...`);
@@ -221,14 +217,15 @@ function Deployer() {
      *__runDependency
      *
      * RunDependency checks if all the dependencies have been deployed, if not it deploys the next dependency
+	 * @param {String} type
      * @param {Number}index
      *@private __runDependency
      */
     function __runDependency(index) {
 
         // done with all dependencies
-        if (index >= self.dependencies.length) {
-            let response = "Finishing checking dependencies...";
+        if (index >= self.tasks.length) {
+            let response = `Finishing checking tasks...`;
             if (self.callback) {
                 self.callback(null, response);
             }
@@ -236,21 +233,22 @@ function Deployer() {
         }
 
         // deploying dependency
-        var dep = self.dependencies[index];
-        console.info(TAG, "Running dependency: [" + index + "] " + dep.name);
+        let dep = self.tasks[index];
+        console.info(TAG, `Running tasks for: [${index}] ${dep.name}`);
         __runAction(index, 0);
     }
 
     /**
      * __runAction
      *
+	 * @param {String} depType
      * @param {Number}depIndex
      * @param {Number}actionIndex
      * @private__runAction
      */
     function __runAction(depIndex, actionIndex) {
 
-        //var self = this;
+        //let self = this;
 
         function next(error, result) {
             if (error) {
@@ -260,20 +258,20 @@ function Deployer() {
                 }
             } else {
                 if (result) {
-                    console.log("depIndex:", depIndex, "actionIndex:", actionIndex, "result:", JSON.stringify(result));
+                    console.log("taskIndex:", depIndex, "actionIndex:", actionIndex, "result:", JSON.stringify(result));
                 }
                 actionIndex++;
                 if (actionIndex < dep.actions.length) {
                     __runAction(depIndex, actionIndex);
                 } else {
-                    if (depIndex < self.dependencies.length) {
+                    if (depIndex < self.tasks.length) {
                         __runDependency(++depIndex);
                     }
                 }
             }
         }
 
-        let dep = self.dependencies[depIndex];
+        let dep = self.tasks[depIndex];
         let action = dep.actions[actionIndex];
         let actionName = typeof action === "object" ? action.type : action;
         let handler = self.actionsRegistry.getActionHandler(actionName, true);
@@ -288,4 +286,4 @@ function Deployer() {
     return self;
 }
 
-module.exports = new Deployer();
+module.exports = new Runner();

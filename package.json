@@ -1,8 +1,8 @@
 {
-  "name": "deployer",
+  "name": "octopus",
   "version": "1.0.0",
-  "description": "PSK Deployer is a custom task runner used in PrivateSky to download and handle all deps and their updates",
-  "main": "Deployer.js",
+  "description": "Octopus is a custom task runner used in PrivateSky to handle all deps and other tasks necessary in projects.",
+  "main": "Runner.js",
   "directories": {
     "lib": "lib"
   },
@@ -11,12 +11,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/privatesky/deployer.git"
+    "url": "git+ssh://git@github.com/privatesky/octopus.git"
   },
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/privatesky/deployer/issues"
+    "url": "https://github.com/privatesky/octopus/issues"
   },
-  "homepage": "https://github.com/privatesky/deployer#readme"
+  "homepage": "https://github.com/privatesky/octopus#readme"
 }

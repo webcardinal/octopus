@@ -58,20 +58,29 @@ function updateConfig(config, callback) {
 	}
 }
 
-function runConfig(config, callback) {
+function runConfig(config, tasksListSelector, callback) {
 	if(typeof config === "function"){
 		callback = config;
+		tasksListSelector = undefined;
 		config = readConfig();
+	}
+
+	if(typeof tasksListSelector === "function"){
+		callback = tasksListSelector;
+		tasksListSelector = undefined;
 	}
 
 	if(typeof config === "undefined"){
 		config = readConfig();
 	}
 
-	const updater = require("../Deployer");
+	if(typeof tasksListSelector === "undefined"){
+		tasksListSelector = "dependencies";
+	}
 
-	updater.setTag("[Octopus]");
-	updater.run(config, callback);
+	const runner = require("../Runner");
+
+	runner.run(config, tasksListSelector, callback);
 }
 
 function handleError(...args){
