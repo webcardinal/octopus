@@ -1,5 +1,6 @@
 const args = process.argv;
 const TYPE_ARGUMENT = "--type=";
+const taskList = "build";
 args.splice(0, 2);
 
 let bindType = "app";
@@ -9,8 +10,8 @@ if (typeof args[0] !== "undefined" && args[0].indexOf(TYPE_ARGUMENT) !== -1) {
 }
 
 const octopus = require("./index.js");
-const installConfig = octopus.readConfig();
-octopus.changeConfigFile("./bind_octopus.json");
+//const installConfig = octopus.readConfig();
+//octopus.changeConfigFile("./bind_octopus.json");
 if (args.length !== 2) {
 	octopus.handleError("Expected to receive 2 params: <solutionName> and <targetName>.");
 }
@@ -27,8 +28,8 @@ function buildIdentifier() {
 let loaderConfigIndex;
 let walletConfigIndex;
 let binDep;
-for (let i = 0; i < installConfig.dependencies.length; i++) {
-	let dep = installConfig.dependencies[i];
+for (let i = 0; i < config.dependencies.length; i++) {
+	let dep = config.dependencies[i];
 	if (dep.name === solutionName) {
 		loaderConfigIndex = i;
 	}
@@ -38,10 +39,14 @@ for (let i = 0; i < installConfig.dependencies.length; i++) {
 	}
 }
 
-for (let i = 0; i < config.dependencies.length; i++) {
-	let dep = config.dependencies[i];
+if(typeof config[taskList] === "undefined"){
+	config[taskList] = [];
+}
+
+for (let i = 0; i < config[taskList].length; i++) {
+	let dep = config[taskList][i];
 	if (dep.name === buildIdentifier()) {
-		binDep = config.dependencies[i];
+		binDep = dep;
 		break;
 	}
 }
@@ -77,7 +82,7 @@ if (typeof binDep === "undefined") {
 			throw new Error("Unrecognized type");
 	}
 
-	config.dependencies.push(binDep);
+	config[taskList].push(binDep);
 }
 
 octopus.runConfig(octopus.createBasicConfig(binDep), function (err) {
