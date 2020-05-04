@@ -52,7 +52,7 @@ function readConfig(disableInitialization) {
 function updateConfig(config, callback) {
 	const fs = require("fs");
 	try {
-		fs.writeFile(CONFIG_FILE_PATH, JSON.stringify(config), callback);
+		fs.writeFile(CONFIG_FILE_PATH, JSON.stringify(config, null, 4), callback);
 	} catch (e) {
 		callback(e);
 	}
