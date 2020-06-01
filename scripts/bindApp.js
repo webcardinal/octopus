@@ -9,12 +9,8 @@ function populateActions(actions, solution, app) {
 		}
 	});
 	actions.push({
-		"type": "mkdir",
-		"target": `./web-server/${solution}/${appNameWithoutPrototype}-template`
-	});
-	actions.push({
 		"type": "execute",
-		"cmd": `echo Use this folder template in order to customize the application instance by adding configuration, pages etc. > ./web-server/${solution}/${appNameWithoutPrototype}-template/readme`
+		"cmd": `echo Use this folder template in order to customize the application instance by adding configuration, pages etc. > ./web-server/${solution}/apps/${appNameWithoutPrototype}/readme`
 	});
 }
 
