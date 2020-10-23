@@ -51,14 +51,15 @@ for (let i = 0; i < config[taskList].length; i++) {
 	}
 }
 
-/*not now this check should be disabled
+/*for now this check should be disabled
 if (typeof loaderConfigIndex === "undefined") {
 	octopus.handleError(`Unable to find a solution config called "${solutionName}"`)
 }*/
 
+/*for now this check should be disabled
 if (typeof walletConfigIndex === "undefined") {
 	octopus.handleError(`Unable to find a wallet/app config called "${targetName}"`)
-}
+}*/
 
 if (typeof binDep === "undefined") {
 	binDep = {
