@@ -3,7 +3,7 @@ function populateActions(actions, solution, app) {
 	actions.push({
 		"type": "copy",
 		"src": `./${app}/seed`,
-		"target": `./web-server/${solution}/apps/${appNameWithoutPrototype}/seed`,
+		"target": `./web-server/${solution}/apps-patch/${appNameWithoutPrototype}/seed`,
 		"options": {
 			overwrite: true
 		}
