@@ -10,7 +10,7 @@ function populateActions(actions, solution, app) {
 	});
 	actions.push({
 		"type": "execute",
-		"cmd": `echo Use this folder template in order to customize the application instance by adding configuration, pages etc. > ./web-server/${solution}/apps/${appNameWithoutPrototype}/readme`
+		"cmd": `echo Use this folder template in order to customize the application instance by adding configuration, pages etc. > ./web-server/${solution}/apps-patch/${appNameWithoutPrototype}/readme`
 	});
 }
 
