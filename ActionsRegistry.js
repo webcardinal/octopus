@@ -8,7 +8,6 @@ const https = require('https');
 
 const fsExt = require('./lib/utils/FSExtension').fsExt;
 
-const accessSync = fs.accessSync;
 const constants = fs.constants || fs;
 const changeSet = "latest-change-set.txt";
 const mergeChangeSet = "Merge";
@@ -225,7 +224,7 @@ function ActionsRegistry() {
             "depth": "1",
             "branch": "master"
         };
-        if (action && typeof action.options === "object") {
+        if (action && !!action.options && typeof action.options === "object") {
             options = action.options;
         }
 
@@ -287,12 +286,12 @@ function ActionsRegistry() {
                             //1 - Fetch
                             let remote = dependency.src;
                             let commitNo = action.commit;
-                            let repoName = dependency.name;
+                            //let repoName = dependency.name;
 
                             let cmdFetch = 'git fetch ' + remote + ' --depth=1 '+ commitNo;                            
                             try {
                                 let fetchResultLog = child_process.execSync(cmdFetch, {cwd: path.resolve(target)} /*basicProcOptions*/).toString();                                
-                                //fs.appendFileSync(changeSet, fetchResultLog);
+                                console.log("Result of fetching of version", changeSet, fetchResultLog);
                             } catch (err) {
                                 console.log(err);
                             }
@@ -301,7 +300,7 @@ function ActionsRegistry() {
                             let cmdCheckout = 'git checkout ' + commitNo;                            
                             try {
                                 let checkoutResultLog = child_process.execSync(cmdCheckout, {cwd: path.resolve(target)} /*, basicProcOptions*/).toString();                                
-                                //fs.appendFileSync(changeSet, checkoutResultLog);
+                                console.log("Result of checkout of version", changeSet, checkoutResultLog);
                             } catch (err) {
                                 console.log(err);
                             }
@@ -344,7 +343,7 @@ function ActionsRegistry() {
                 "depth": "1",
                 "branch": "master"
             };
-            if (action && typeof action.options === "object") {
+            if (action && !!action.options && typeof action.options === "object") {
                 options = action.options;
             }
 
@@ -674,18 +673,6 @@ function ActionsRegistry() {
 
             return !!stdout;
         } catch (error) {
-            return false;
-        }
-
-        return _localExecutableSync(commandName);
-
-    };
-
-    let _localExecutableSync = function (commandName) {
-        try {
-            accessSync(commandName, constants.F_OK | constants.X_OK);
-            return true;
-        } catch (e) {
             return false;
         }
     };

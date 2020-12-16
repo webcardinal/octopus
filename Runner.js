@@ -1,4 +1,3 @@
-const fs = require("fs");
 const actionsRegistry = require("./ActionsRegistry");
 const path = require("path");
 let TAG = "[Octopus]";
