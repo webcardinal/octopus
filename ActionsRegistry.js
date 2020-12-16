@@ -8,11 +8,9 @@ const https = require('https');
 
 const fsExt = require('./lib/utils/FSExtension').fsExt;
 
-const constants = fs.constants || fs;
 const changeSet = "latest-change-set.txt";
 const mergeChangeSet = "Merge";
 const changeSetDefaultSize = 3;
-
 
 /**
  * Contains default actions
@@ -224,7 +222,7 @@ function ActionsRegistry() {
             "depth": "1",
             "branch": "master"
         };
-        if (action && !!action.options && typeof action.options === "object") {
+        if (typeof action.options === "object") {
             options = action.options;
         }
 
@@ -343,7 +341,7 @@ function ActionsRegistry() {
                 "depth": "1",
                 "branch": "master"
             };
-            if (action && !!action.options && typeof action.options === "object") {
+            if (typeof action.options === "object") {
                 options = action.options;
             }
 
