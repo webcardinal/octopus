@@ -4,12 +4,21 @@
  * npm -> package.json -> [scripts]/freeze.js
  * */
 
-const fsExt = require('../lib/utils/FSExtension').fsExt;
+const args = process.argv;
+args.splice(0, 2);
+
+console.log("Arguments", args);
+
 const octopus = require("./index");
+let targets = ["dependencies"];
+
+if(args.length > 0){
+    targets = args;
+}
+
 const path = require("path");
 const fs = require("fs");
 const child_process = require('child_process');
-
 
 // Save current config file
 currentConfigFile = octopus.getConfigFile();
@@ -22,14 +31,14 @@ let config =  octopus.readConfig();
 /**Performs a freeze on current configuration loaded from file (octopus.json or octopus-dev.json) */
 function freezeConfig(config){
 
-    function updateSmartCloneAction(dependency, action){
+    function updateSmartCloneAction(task, action){
         /**
          * If the action has the commit no - ignore it
          * Else take current commit no (current head) from git
          */
         // if(typeof action.commit == "undefined"){
             console.log("Found " + action.type + " to be ready for update");          
-            var targetFolder = path.resolve(path.join(config.workDir, dependency.name));
+            var targetFolder = path.resolve(path.join(config.workDir, task.name));
             console.log("Dependency folder: " + targetFolder);
 
             basicProcOptions = {cwd: targetFolder};
@@ -52,16 +61,21 @@ function freezeConfig(config){
         // }
     }
 
-    for (i=0;i<config.dependencies.length; i++){        
-        let dep = config.dependencies[i];
-        for(j=0;j<dep.actions.length; j++){
-            let action = dep.actions[j];
-            if(action.type == 'smartClone'){
-                updateSmartCloneAction(dep, action);
+    targets.forEach(target=>{
+        let tasks = config[target];
+        if(typeof tasks === "undefined"){
+            return octopus.handleError(`Unable to find the task list called <${target}> in current config.`);
+        }
+        for (let i=0; i<tasks.length; i++){
+            let task = tasks[i];
+            for(let j=0;j<task.actions.length; j++){
+                let action = task.actions[j];
+                if(action.type == 'smartClone'){
+                    updateSmartCloneAction(task, action);
+                }
             }
         }
-    }
-
+    });
 }
 
 //Update config
