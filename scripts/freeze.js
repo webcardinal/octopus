@@ -7,8 +7,6 @@
 const args = process.argv;
 args.splice(0, 2);
 
-console.log("Arguments", args);
-
 const octopus = require("./index");
 let targets = ["dependencies"];
 
@@ -27,6 +25,7 @@ currentConfigFile = octopus.getConfigFile();
 octopus.changeConfigFile('./octopus-dev.json');
 
 let config =  octopus.readConfig();
+let notFoundFolders = [];
 
 /**Performs a freeze on current configuration loaded from file (octopus.json or octopus-dev.json) */
 function freezeConfig(config){
@@ -37,30 +36,29 @@ function freezeConfig(config){
          * Else take current commit no (current head) from git
          */
         // if(typeof action.commit == "undefined"){
-            console.log("Found " + action.type + " to be ready for update");          
-            var targetFolder = path.resolve(path.join(config.workDir, task.name));
-            console.log("Dependency folder: " + targetFolder);
-
+            let targetFolder = path.resolve(path.join(config.workDir, task.name));
+            console.log(`Trying to locate target ${targetFolder} in order to save it's state.`);
             basicProcOptions = {cwd: targetFolder};
 
             if (fs.existsSync(targetFolder) && fs.readdirSync(targetFolder).length > 0 ) {
-
-                //Get commit number 
+                //Get commit number
                 try {
                     let out = child_process.execSync("git rev-parse HEAD", basicProcOptions).toString().trim();
                     if(out.length == 40){
                         action.commit = out;
                     }
+                    console.log(`Saved the state of ${targetFolder} at revision ${out}`);
                 } catch (err) {
-                    console.log(err);
+                    octopus.handleError(`Not able to perform the saving state process for target ${targetFolder}. Reason:`, err);
                 }
             }
             else{
-                console.log("Folder/Repo " + targetFolder + " not available. Please make sure all repositories were pulled and updated to correct version");
+                notFoundFolders.push(targetFolder);
             }
         // }
     }
 
+    console.log(`The scanning process will be performed for the following task lists `, targets);
     targets.forEach(target=>{
         let tasks = config[target];
         if(typeof tasks === "undefined"){
@@ -68,7 +66,7 @@ function freezeConfig(config){
         }
         for (let i=0; i<tasks.length; i++){
             let task = tasks[i];
-            for(let j=0;j<task.actions.length; j++){
+            for(let j=0; j<task.actions.length; j++){
                 let action = task.actions[j];
                 if(action.type == 'smartClone'){
                     updateSmartCloneAction(task, action);
@@ -80,6 +78,12 @@ function freezeConfig(config){
 
 //Update config
 freezeConfig(config);
+
+if(notFoundFolders.length > 0){
+    console.log(`\n===============\nOctopus was not able to locate the following paths:\n`);
+    notFoundFolders.forEach( folder => console.log(folder));
+    console.log(`\nIf neccessary, check the situations and run again the script.\n===============`);
+}
 
 //Switch to stable octopus
 octopus.changeConfigFile('./octopus.json');
