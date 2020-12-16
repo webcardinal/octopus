@@ -29,7 +29,7 @@ function freezeConfig(config){
          */
         // if(typeof action.commit == "undefined"){
             console.log("Found " + action.type + " to be ready for update");          
-            var targetFolder = fsExt.resolvePath(path.join(config.workDir, dependency.name));
+            var targetFolder = path.resolve(path.join(config.workDir, dependency.name));
             console.log("Dependency folder: " + targetFolder);
 
             basicProcOptions = {cwd: targetFolder};
