@@ -472,11 +472,9 @@ function ActionsRegistry() {
             if(err) throw err;
 
             try{
-                process.chdir(tmpFolder);
-            
 
                 //2 Init repo
-                let cmdInit = 'git init';
+                let cmdInit = `cd ${tmpFolder} && git init`;
                 console.log(cmdInit);                
                 try{
                     child_process.execSync(cmdInit);
@@ -486,7 +484,7 @@ function ActionsRegistry() {
                 
 
                 //2.1 Add remote repo
-                let cmdAddRemote = 'git remote add origin ' + remote;
+                let cmdAddRemote = `cd ${tmpFolder} && git remote add origin ${remote}`;
                 console.log(cmdAddRemote);
                 try{
                     child_process.execSync(cmdAddRemote);
@@ -495,7 +493,7 @@ function ActionsRegistry() {
                 }
 
                 //3 Fetch repo at certain commit no
-                let cmdFetch = 'git fetch ' + remote + ' --depth=1 '+ commitNo;
+                let cmdFetch = `cd ${tmpFolder} && git fetch ` + remote + ' --depth=1 '+ commitNo;
                 console.log(cmdFetch);
                 try{
                     child_process.execSync(cmdFetch);
@@ -504,7 +502,7 @@ function ActionsRegistry() {
                 }
 
                 //4 Checkout commit number
-                let cmdCheckout = 'git checkout ' + commitNo;
+                let cmdCheckout = `cd ${tmpFolder} && git checkout ` + commitNo;
                 console.log(cmdCheckout);
                 try{
                     child_process.execSync(cmdCheckout);
@@ -515,7 +513,6 @@ function ActionsRegistry() {
             } catch(ex){
                 callback(ex);
             }
-
             callback();
         })        
     };
