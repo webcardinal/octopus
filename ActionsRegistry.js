@@ -7,6 +7,7 @@ const http = require('http');
 const https = require('https');
 
 const fsExt = require('./lib/utils/FSExtension').fsExt;
+const { CARDINAL_TAG, ComponentsBuilder, ThemesBuilder } = require('./lib/cardinal');
 
 const changeSet = "latest-change-set.txt";
 const mergeChangeSet = "Merge";
@@ -833,6 +834,74 @@ function ActionsRegistry() {
             callback(undefined, `Execute command finished.`);
 
         });
+    };
+
+    /**
+     * buildCardinalComponents
+     *
+     * @param {Object} action
+     * @param {Object} dependency
+     */
+    actions.buildCardinalComponents = function (action, dependency) {
+        let src = action.src || dependency.src;
+        if (!src) {
+            throw "No source (src) attribute found on: " + JSON.stringify(dependency);
+        }
+
+        let target = action.target;
+        if (!src) {
+            throw "No target attribute found on: " + JSON.stringify(dependency);
+        }
+
+        const build = async() => {
+            const octopusRunner = require('./Runner');
+            const componentsBuilder = new ComponentsBuilder(octopusRunner, src, target);
+
+            try {
+                await componentsBuilder.build();
+                await componentsBuilder.copy();
+                await componentsBuilder.merge();
+                console.log(CARDINAL_TAG, 'buildCardinalComponents command finished.');
+            } catch (error) {
+                console.error(CARDINAL_TAG, error);
+            }
+        }
+
+        build().then();
+    };
+
+    /**
+     * buildCardinalThemes
+     *
+     * @param {Object} action
+     * @param {Object} dependency
+     */
+    actions.buildCardinalThemes = function (action, dependency) {
+        let src = action.src || dependency.src;
+        if (!src) {
+            throw "No source (src) attribute found on: " + JSON.stringify(dependency);
+        }
+
+        let target = action.target;
+        if (!src) {
+            throw "No target attribute found on: " + JSON.stringify(dependency);
+        }
+
+        const build = async() => {
+            const octopusRunner = require('./Runner');
+            const componentsBuilder = new ComponentsBuilder(octopusRunner, src, target);
+            const themesBuilder = new ThemesBuilder(src, target);
+
+            try {
+                const config = await themesBuilder.copy();
+                await componentsBuilder.run(config);
+                console.log(CARDINAL_TAG, 'buildCardinalThemes command finished.');
+            } catch (error) {
+                console.error(CARDINAL_TAG, error);
+            }
+        }
+
+        build().then();
     };
 
     this.registerActionHandler = function (name, handler, overwrite) {
