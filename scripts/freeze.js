@@ -37,6 +37,9 @@ function freezeConfig(config){
          */
         // if(typeof action.commit == "undefined"){
             let targetFolder = path.resolve(path.join(config.workDir, task.name));
+            if (action.target) {
+                targetFolder = path.resolve(path.join(action.target, task.name));
+            }
             console.log(`Trying to locate target ${targetFolder} in order to save it's state.`);
             basicProcOptions = {cwd: targetFolder};
 
@@ -66,6 +69,9 @@ function freezeConfig(config){
         }
         for (let i=0; i<tasks.length; i++){
             let task = tasks[i];
+            if(!task.actions || !Array.isArray(task.actions) || task.actions.length === 0){
+                require("./../lib/utils/ConfigurationDefaults").setDefaultActions(task);
+            }
             for(let j=0; j<task.actions.length; j++){
                 let action = task.actions[j];
                 if(action.type == 'smartClone'){
