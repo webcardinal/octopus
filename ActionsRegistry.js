@@ -853,9 +853,11 @@ function ActionsRegistry() {
             throw "No target attribute found on: " + JSON.stringify(dependency);
         }
 
+        let options = action.options || {};
+
         const build = async() => {
             const octopusRunner = require('./Runner');
-            const componentsBuilder = new ComponentsBuilder(octopusRunner, src, target);
+            const componentsBuilder = new ComponentsBuilder(octopusRunner, src, target, options);
 
             try {
                 await componentsBuilder.build();
