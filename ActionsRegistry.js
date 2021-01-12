@@ -7,7 +7,7 @@ const http = require('http');
 const https = require('https');
 
 const fsExt = require('./lib/utils/FSExtension').fsExt;
-const { CARDINAL_TAG, ComponentsBuilder, ThemesBuilder } = require('./lib/cardinal');
+const { WEBCARDINAL_TAG, ComponentsBuilder, ThemesBuilder } = require('./lib/cardinal');
 
 const changeSet = "latest-change-set.txt";
 const mergeChangeSet = "Merge";
@@ -837,12 +837,12 @@ function ActionsRegistry() {
     };
 
     /**
-     * buildCardinalComponents
+     * buildWebCardinalComponents
      *
      * @param {Object} action
      * @param {Object} dependency
      */
-    actions.buildCardinalComponents = function (action, dependency) {
+    actions.buildWebCardinalComponents = function (action, dependency) {
         let src = action.src || dependency.src;
         if (!src) {
             throw "No source (src) attribute found on: " + JSON.stringify(dependency);
@@ -863,9 +863,9 @@ function ActionsRegistry() {
                 await componentsBuilder.build();
                 await componentsBuilder.copy();
                 await componentsBuilder.merge();
-                console.log(CARDINAL_TAG, 'buildCardinalComponents command finished.');
+                console.log(WEBCARDINAL_TAG, 'buildWebCardinalComponents command finished.');
             } catch (error) {
-                console.error(CARDINAL_TAG, error);
+                console.error(WEBCARDINAL_TAG, error);
             }
         }
 
@@ -873,12 +873,12 @@ function ActionsRegistry() {
     };
 
     /**
-     * buildCardinalThemes
+     * buildWebCardinalThemes
      *
      * @param {Object} action
      * @param {Object} dependency
      */
-    actions.buildCardinalThemes = function (action, dependency) {
+    actions.buildWebCardinalThemes = function (action, dependency) {
         let src = action.src || dependency.src;
         if (!src) {
             throw "No source (src) attribute found on: " + JSON.stringify(dependency);
@@ -897,9 +897,9 @@ function ActionsRegistry() {
             try {
                 const config = await themesBuilder.copy();
                 await componentsBuilder.run(config);
-                console.log(CARDINAL_TAG, 'buildCardinalThemes command finished.');
+                console.log(WEBCARDINAL_TAG, 'buildWebCardinalThemes command finished.');
             } catch (error) {
-                console.error(CARDINAL_TAG, error);
+                console.error(WEBCARDINAL_TAG, error);
             }
         }
 
