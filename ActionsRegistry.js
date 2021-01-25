@@ -7,10 +7,7 @@ const http = require('http');
 const https = require('https');
 
 const fsExt = require('./lib/utils/FSExtension').fsExt;
-const {
-    WEBCARDINAL_TAG,
-    ComponentsInstaller, ComponentsBuilder, ThemesBuilder
-} = require('./lib/webcardinal');
+const WebCardinal = require('./lib/webcardinal');
 
 const changeSet = "latest-change-set.txt";
 const mergeChangeSet = "Merge";
@@ -841,7 +838,7 @@ function ActionsRegistry() {
 
     actions.cloneWebCardinalComponents = function (action, dependency) {
         let target = action.target || dependency.target;
-        // ComponentsInstaller has a default target
+        // WebCardinal.Installer has a default target
 
         let components = action.components;
         if (!components) {
@@ -853,14 +850,15 @@ function ActionsRegistry() {
         }
 
         const clone = async () => {
+            const { Installer, TAG } = WebCardinal;
             try {
                 const octopus = require('./Runner');
-                const installer = new ComponentsInstaller(octopus, target, components);
+                const installer = new Installer(octopus, target, components);
                 await installer.clone();
                 await installer.install();
-                console.log(WEBCARDINAL_TAG, 'cloneWebCardinalComponents command finished.');
+                console.log(TAG, 'cloneWebCardinalComponents command finished.');
             } catch (error) {
-                console.error(WEBCARDINAL_TAG, error);
+                console.error(TAG, error);
             }
         }
 
@@ -876,14 +874,15 @@ function ActionsRegistry() {
     actions.buildWebCardinalComponents = function (action, dependency) {
         let src = action.src || dependency.src;
         let target = action.target;
-        // ComponentsBuilder has default values for src and target
+        // WebCardinal.Builder has default values for src and target
 
         let options = action.options || { DEV: false, devComponents: null };
 
         const build = async () => {
+            const { Builder, TAG } = WebCardinal;
             try {
                 const octopus = require('./Runner');
-                const builder = new ComponentsBuilder(octopus, src, target, options);
+                const builder = new Builder(octopus, src, target, options);
                 if (!options.devComponents) {
                     // build all and merge (default)
                     await builder.build();
@@ -894,9 +893,9 @@ function ActionsRegistry() {
                     await builder.build(options.devComponents);
                     await builder.copy(options.devComponents);
                 }
-                console.log(WEBCARDINAL_TAG, 'buildWebCardinalComponents command finished.');
+                console.log(TAG, 'buildWebCardinalComponents command finished.');
             } catch (error) {
-                console.error(WEBCARDINAL_TAG, error);
+                console.error(TAG, error);
             }
         }
 
@@ -912,16 +911,17 @@ function ActionsRegistry() {
     actions.buildWebCardinalThemes = function (action, dependency) {
         let src = action.src || dependency.src;
         let target = action.target;
-        // ThemesBuilder has default values for src and target
+        // WebCardinal.ThemesBuilder has default values for src and target
 
         const build = async () => {
+            const { ThemeBuilder, TAG } = WebCardinal;
             try {
                 const octopus = require('./Runner');
-                const builder = new ThemesBuilder(octopus, src, target);
+                const builder = new ThemeBuilder(octopus, src, target);
                 await builder.copy();
-                console.log(WEBCARDINAL_TAG, 'buildWebCardinalThemes command finished.');
+                console.log(TAG, 'buildWebCardinalThemes command finished.');
             } catch (error) {
-                console.error(WEBCARDINAL_TAG, error);
+                console.error(TAG, error);
             }
         }
 
